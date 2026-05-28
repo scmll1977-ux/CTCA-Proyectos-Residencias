@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CTCA — Proyectos de Residencia Profesional 2025–2026</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --azul:   #0D2A5E;
+    --azul2:  #1A4F9C;
+    --azul3:  #091E42;
+    --dorado: #C8A84B;
+    --doradoL:#F0DCAA;
+    --blanco: #FFFFFF;
+    --gris1:  #F4F6FA;
+    --gris2:  #E8EDF5;
+    --grisT:  #4A5568;
+    --verde:  #1A7A4A;
+    --verdeL: #E6F4ED;
+    --amarL:  #FFFBE6;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; scroll-snap-type: y mandatory; }
+  body { font-family: 'DM Sans', sans-serif; background: var(--azul3); color: var(--blanco); overflow-x: hidden; }
+
+  /* PROGRESS */
+  #progress { position: fixed; top: 0; left: 0; height: 3px; background: var(--dorado); z-index: 1000; transition: width .3s; }
+
+  /* NAV DOTS */
+  #nav-dots {
+    position: fixed; right: 1.2rem; top: 50%; transform: translateY(-50%);
+    display: flex; flex-direction: column; gap: .45rem; z-index: 999;
+  }
+  .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: rgba(200,168,75,.3); cursor: pointer;
+    transition: all .3s; border: 1.5px solid rgba(200,168,75,.45);
+  }
+  .dot.active { background: var(--dorado); transform: scale(1.5); }
+
+  /* SLIDE BASE */
+  .slide {
+    min-height: 100vh; scroll-snap-align: start;
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 3rem 5vw; position: relative; overflow: hidden;
+    opacity: 0; transform: translateY(28px);
+    transition: opacity .65s ease, transform .65s ease;
+  }
+  .slide.visible { opacity: 1; transform: translateY(0); }
+
+  /* STAGGER */
+  .stagger > * { opacity: 0; transform: translateY(18px); transition: opacity .45s ease, transform .45s ease; }
+  .stagger.go > *:nth-child(1)  { opacity:1;transform:none;transition-delay:.04s }
+  .stagger.go > *:nth-child(2)  { opacity:1;transform:none;transition-delay:.10s }
+  .stagger.go > *:nth-child(3)  { opacity:1;transform:none;transition-delay:.16s }
+  .stagger.go > *:nth-child(4)  { opacity:1;transform:none;transition-delay:.22s }
+  .stagger.go > *:nth-child(5)  { opacity:1;transform:none;transition-delay:.28s }
+  .stagger.go > *:nth-child(6)  { opacity:1;transform:none;transition-delay:.34s }
+  .stagger.go > *:nth-child(7)  { opacity:1;transform:none;transition-delay:.40s }
+  .stagger.go > *:nth-child(8)  { opacity:1;transform:none;transition-delay:.46s }
+  .stagger.go > *:nth-child(9)  { opacity:1;transform:none;transition-delay:.52s }
+  .stagger.go > *:nth-child(10) { opacity:1;transform:none;transition-delay:.58s }
+
+  /* HEADER SLIDE */
+  .slide-header { margin-bottom: 2rem; }
+  .slide-header h2 {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(1.6rem, 3.5vw, 2.4rem); font-weight: 700; line-height: 1.15;
+  }
+  .slide-header .sub { font-size: .9rem; margin-top: .4rem; }
+  .gold-dot { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--dorado); margin-right: .55rem; vertical-align: middle; }
+
+  /* ════ SLIDE 1 — PORTADA PROYECTOS ════ */
+  #sp1 { background: var(--azul); flex-direction: row; padding: 0; gap: 0; }
+  #sp1 .left {
+    flex: 1.3; padding: 4rem 3rem 4rem 5vw;
+    display: flex; flex-direction: column; justify-content: center;
+    border-right: 1px solid rgba(200,168,75,.15);
+  }
+  #sp1 .right {
+    flex: .9; background: var(--azul3);
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center; gap: 0; padding: 2.5rem;
+  }
+  .ctca-logo { font-family:'Playfair Display',serif; font-size:clamp(3rem,8vw,5.5rem); font-weight:900; color:var(--dorado); line-height:1; letter-spacing:.04em; }
+  .port-nombre { font-size:clamp(.95rem,1.8vw,1.2rem); font-weight:600; color:var(--blanco); margin:.4rem 0 1rem; }
+  .port-titulo { font-family:'Playfair Display',serif; font-size:clamp(1.3rem,3vw,2rem); font-weight:700; color:var(--blanco); line-height:1.2; margin-bottom:.8rem; }
+  .port-sub { font-size:.9rem; color:#AABBD0; line-height:1.65; font-style:italic; }
+  .gold-line-h { width:200px; height:3px; background:var(--dorado); margin:1.2rem 0; }
+  .port-contact { font-size:.82rem; color:#7A95CC; line-height:1.9; }
+  .index-num { font-family:'Playfair Display',serif; font-size:5rem; font-weight:900; color:var(--dorado); line-height:1; }
+  .index-label { font-size:.75rem; color:#8899CC; text-transform:uppercase; letter-spacing:.12em; margin-bottom:1.5rem; }
+  .carreras-port { text-align:center; }
+  .carr-item { font-size:.8rem; color:#8AABCC; padding:.35rem .7rem; border:1px solid rgba(200,168,75,.2); border-radius:2px; margin:.25rem 0; display:block; }
+  .footer-slide { position:absolute; bottom:.9rem; left:0; right:0; text-align:center; font-size:.72rem; color:#3A5070; letter-spacing:.08em; text-transform:uppercase; }
+
+  /* ════ SLIDE 2 — ÍNDICE ════ */
+  #sp2 { background: var(--blanco); color: var(--azul); }
+  #sp2 .slide-header h2 { color: var(--azul); }
+  #sp2 .slide-header .sub { color: var(--grisT); }
+  .tabla-indice { width:100%; border-collapse: collapse; font-size:.88rem; }
+  .tabla-indice thead tr { background: var(--azul); color: var(--blanco); }
+  .tabla-indice thead th { padding: .65rem .9rem; text-align:left; font-weight:600; letter-spacing:.04em; }
+  .tabla-indice thead th:last-child { text-align:center; }
+  .tabla-indice tbody tr { border-bottom: 1px solid var(--gris2); transition: background .2s; cursor:pointer; }
+  .tabla-indice tbody tr:hover { background: var(--gris1); }
+  .tabla-indice tbody tr:nth-child(even) { background: var(--gris1); }
+  .tabla-indice tbody tr:nth-child(even):hover { background: var(--gris2); }
+  .tabla-indice td { padding: .6rem .9rem; color: var(--grisT); }
+  .tabla-indice td:first-child { font-family:'Playfair Display',serif; font-weight:700; color:var(--azul); font-size:1rem; }
+  .tabla-indice td:last-child { text-align:center; }
+  .badge { display:inline-block; padding:.2rem .6rem; border-radius:20px; font-size:.72rem; font-weight:600; }
+  .badge-h480 { background:#EEF4FD; color:var(--azul2); }
+  .badge-h360 { background:var(--verdeL); color:var(--verde); }
+
+  /* ════ SLIDES P3–P12 — CADA PROYECTO ════ */
+  .proy-slide { background: var(--gris1); color: var(--azul); }
+  .proy-slide:nth-child(even) { background: var(--blanco); }
+
+  /* Número de proyecto grande */
+  .proy-num-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 52px; height: 52px; border-radius: 4px;
+    background: var(--azul); color: var(--dorado);
+    font-family:'Playfair Display',serif; font-size:1.6rem; font-weight:900;
+    margin-bottom:.8rem; flex-shrink:0;
+  }
+  .proy-header { display:flex; align-items:flex-start; gap:1rem; margin-bottom:1.5rem; }
+  .proy-header-text h2 { font-family:'Playfair Display',serif; font-size:clamp(1.3rem,3vw,1.9rem); font-weight:700; color:var(--azul); line-height:1.2; }
+  .proy-area { font-size:.8rem; color:var(--azul2); font-weight:600; letter-spacing:.05em; margin-top:.3rem; }
+
+  /* Layout 2 columnas */
+  .proy-body { display:grid; grid-template-columns:1.1fr 1fr; gap:1.4rem; }
+  .proy-left {}
+  .proy-right {}
+
+  .proy-section-label { font-size:.68rem; font-weight:700; letter-spacing:.14em; text-transform:uppercase; color:var(--azul2); margin-bottom:.45rem; }
+  .proy-desc { font-size:.88rem; color:var(--grisT); line-height:1.68; margin-bottom:1.1rem; }
+  .proy-objetivo { font-size:.88rem; color:var(--grisT); line-height:1.68; }
+
+  /* Info chips */
+  .info-grid { display:grid; grid-template-columns:1fr 1fr; gap:.55rem; margin-bottom:1.1rem; }
+  .info-chip { border-radius:4px; padding:.6rem .8rem; }
+  .info-chip .ic-label { font-size:.65rem; font-weight:700; letter-spacing:.1em; text-transform:uppercase; margin-bottom:.2rem; }
+  .info-chip .ic-val { font-size:.82rem; line-height:1.45; }
+  .chip-dur { background:var(--verdeL); grid-column:1/-1; }
+  .chip-dur .ic-label { color:var(--verde); }
+  .chip-dur .ic-val { color:#144D2E; font-weight:500; }
+  .chip-perfil { background:#EEF4FD; }
+  .chip-perfil .ic-label { color:var(--azul2); }
+  .chip-perfil .ic-val { color:var(--azul); }
+  .chip-comp { background:var(--amarL); grid-column:1/-1; }
+  .chip-comp .ic-label { color:#856404; }
+  .chip-comp .ic-val { color:#5A4000; }
+
+  /* Entregables */
+  .entregables-list { list-style:none; }
+  .entregables-list li {
+    display:flex; gap:.6rem; align-items:flex-start;
+    padding:.42rem 0; border-bottom:1px solid var(--gris2);
+    font-size:.82rem; color:var(--grisT); line-height:1.5;
+  }
+  .entregables-list li:last-child { border-bottom:none; }
+  .ent-num {
+    min-width:22px; height:22px; border-radius:3px;
+    background:var(--azul2); color:var(--blanco);
+    font-size:.72rem; font-weight:700;
+    display:flex; align-items:center; justify-content:center; flex-shrink:0; margin-top:.05rem;
+  }
+
+  /* ════ SLIDE CIERRE ════ */
+  #sp13 { background: var(--azul); flex-direction:row; padding:0; gap:0; }
+  #sp13 .left { flex:1.2; padding:4rem 3rem 4rem 5vw; display:flex; flex-direction:column; justify-content:center; border-right:1px solid rgba(200,168,75,.15); }
+  #sp13 .right { flex:.9; background:var(--azul3); display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.9rem; padding:3rem; }
+  .cond-row { display:flex; gap:.8rem; align-items:flex-start; padding:.6rem 0; border-bottom:1px solid rgba(255,255,255,.07); }
+  .cond-label { font-size:.7rem; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--dorado); min-width:100px; flex-shrink:0; padding-top:.05rem; }
+  .cond-val { font-size:.85rem; color:#AABBD0; line-height:1.5; }
+  .cta-gold { background:var(--dorado); border-radius:4px; padding:1rem 1.5rem; text-align:center; font-size:.95rem; font-weight:700; color:var(--azul); margin:1.2rem 0; animation:pulse 2.5s infinite; }
+  @keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(200,168,75,.4)} 50%{box-shadow:0 0 0 10px rgba(200,168,75,0)} }
+  .contact-row { display:flex; align-items:center; gap:.7rem; font-size:.88rem; color:#8AABCC; padding:.35rem 0; }
+  .contact-row .ic { color:var(--dorado); font-size:1rem; }
+  .seg-chip { width:180px; text-align:center; padding:.5rem; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.1); border-radius:3px; font-size:.82rem; }
+
+  /* responsive */
+  @media(max-width:768px){
+    .proy-body { grid-template-columns:1fr; }
+    #sp1,#sp13 { flex-direction:column; }
+    #sp1 .right,#sp13 .right { padding:1.5rem; }
+    .info-grid { grid-template-columns:1fr; }
+    .chip-dur,.chip-comp { grid-column:1; }
+  }
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+<nav id="nav-dots" id="navdots"></nav>
+
+<!-- ══ SLIDE 1 — PORTADA ══ -->
+<section class="slide visible" id="sp1">
+  <div class="left">
+    <div class="ctca-logo">CTCA</div>
+    <div class="port-nombre">Consorcio Tributario Castro y Asociados, S.C.</div>
+    <div class="port-titulo">Propuesta de Proyectos de<br>Residencia Profesional</div>
+    <p class="port-sub">Vinculación Academia–Empresa · Ciclo escolar 2025–2026</p>
+    <div class="gold-line-h"></div>
+    <div class="port-contact">
+      ctca@servincont.com &nbsp;·&nbsp; 733 115-0838<br>
+      Vicente Guerrero No. 81, Int. 11 y 12, Col. Centro<br>
+      Iguala de la Independencia, Guerrero · C.P. 40000
+    </div>
+  </div>
+  <div class="right">
+    <div class="index-num">10</div>
+    <div class="index-label">proyectos disponibles</div>
+    <div class="carreras-port">
+      <span class="carr-item">Lic. en Contador Público</span>
+      <span class="carr-item">Lic. en Gestión Empresarial</span>
+      <span class="carr-item">Ing. en Sistemas Computacionales</span>
+    </div>
+  </div>
+  <div class="footer-slide">C.P. Martín Castro · Director General · Miembro CCPEGRO</div>
+</section>
+
+<!-- ══ SLIDE 2 — ÍNDICE ══ -->
+<section class="slide" id="sp2">
+  <div class="slide-header">
+    <h2><span class="gold-dot"></span>Resumen de Proyectos Disponibles</h2>
+    <p class="sub">Haz clic en cualquier proyecto para ir directamente a su descripción completa</p>
+  </div>
+  <table class="tabla-indice stagger">
+    <thead>
+      <tr><th>No.</th><th>Proyecto</th><th>Área</th><th>Horas</th></tr>
+    </thead>
+    <tbody id="tabla-body"></tbody>
+  </table>
+</section>
+
+<!-- ══ SLIDES P3–P12 — PROYECTOS (generados por JS) ══ -->
+<div id="proyectos-container"></div>
+
+<!-- ══ SLIDE 13 — CONDICIONES Y CONTACTO ══ -->
+<section class="slide" id="sp13">
+  <div class="left">
+    <div class="slide-header">
+      <h2><span class="gold-dot"></span>Condiciones Generales de Residencia</h2>
+    </div>
+    <div class="cond-row"><span class="cond-label">Sede</span><span class="cond-val">Vicente Guerrero No. 81, Int. 11 y 12, Col. Centro, Iguala de la Independencia, Gro. C.P. 40000</span></div>
+    <div class="cond-row"><span class="cond-label">Modalidad</span><span class="cond-val">Presencial en instalaciones del despacho</span></div>
+    <div class="cond-row"><span class="cond-label">Horario</span><span class="cond-val">Lunes a viernes · 9:00–14:00 h y 16:00–18:00 h</span></div>
+    <div class="cond-row"><span class="cond-label">Asesor</span><span class="cond-val">C.P. Martín Castro — Director General</span></div>
+    <div class="cond-row"><span class="cond-label">Remuneración</span><span class="cond-val">No remunerada. Se expide carta de aceptación y constancia de cumplimiento</span></div>
+    <div class="cond-row"><span class="cond-label">Documentos</span><span class="cond-val">Carta de presentación institucional, seguro médico vigente, reporte de avance mensual</span></div>
+    <div class="cond-row"><span class="cond-label">Plazas</span><span class="cond-val">Una plaza por proyecto · Máximo 2 residentes simultáneos</span></div>
+    <div class="cta-gold">Primera consulta sin costo — contáctanos hoy mismo</div>
+    <div class="contact-row"><span class="ic">📞</span> 733 115-0838 · 733 106-2894 · 733 119-1266</div>
+    <div class="contact-row"><span class="ic">✉️</span> ctca@servincont.com</div>
+  </div>
+  <div class="right">
+    <div style="font-family:'Playfair Display',serif;font-size:3.5rem;font-weight:900;color:var(--dorado)">CTCA</div>
+    <div style="font-size:.85rem;font-weight:600;color:var(--blanco);margin-bottom:1rem;text-align:center">Consorcio Tributario Castro y Asociados, S.C.</div>
+    <div style="font-size:.68rem;letter-spacing:.1em;text-transform:uppercase;color:var(--dorado);margin-bottom:.5rem">Atendemos a</div>
+    <div class="seg-chip">Personas Físicas</div>
+    <div class="seg-chip">Personas Morales</div>
+    <div class="seg-chip">MIPYMES</div>
+    <div class="seg-chip">Residentes Universitarios</div>
+    <div style="margin-top:1.2rem;font-size:.72rem;color:#3A5070;font-style:italic;text-align:center">Profesionalismo, ética y compromiso<br>con su éxito empresarial</div>
+  </div>
+</section>
+
+<script>
+// ══════════ DATOS DE LOS 10 PROYECTOS ══════════
+const proyectos = [
+  {
+    num: 1,
+    titulo: "Sistema de Control de Obligaciones Fiscales",
+    area: "Fiscal / Tecnología Aplicada",
+    descripcion: "Desarrollo de una herramienta automatizada en Excel (con macros VBA) para el seguimiento oportuno de las fechas límite y cumplimiento de obligaciones fiscales de los clientes del despacho, clasificados por régimen fiscal (RESICO, General de Ley, Personas Morales, entre otros).",
+    objetivo: "Diseñar e implementar un sistema funcional que centralice el calendario fiscal mensual y anual de los clientes del despacho, reduciendo el riesgo de incumplimiento y facilitando la gestión del trabajo operativo.",
+    duracion: "4 meses · 480 horas",
+    perfil: "Contaduría Pública, Administración o Informática Administrativa. Excel intermedio-avanzado deseable.",
+    competencias: "Excel/VBA, plazos SAT (Art. 12 CFF), LISR, LIVA. Organización y redacción técnica.",
+    entregables: [
+      "Diagnóstico del proceso actual de seguimiento de obligaciones en el despacho",
+      "Catálogo de obligaciones por régimen fiscal (RESICO PF, General, PM)",
+      "Herramienta Excel con calendario fiscal automatizado, alertas por vencimiento y semáforo de cumplimiento",
+      "Manual de usuario del sistema desarrollado",
+      "Informe final de residencia con conclusiones y recomendaciones",
+    ]
+  },
+  {
+    num: 2,
+    titulo: "Digitalización y Clasificación de Expedientes de Clientes",
+    area: "Gestión Documental / Administración",
+    descripcion: "Diseño e implementación de un sistema estructurado de gestión documental para los expedientes de clientes del despacho, abarcando CFDIs, declaraciones fiscales, contratos, poderes notariales, actas constitutivas y papeles de trabajo, bajo criterios de orden, confidencialidad y acceso controlado.",
+    objetivo: "Crear una estructura estandarizada de expedientes físicos y digitales que permita al despacho localizar, conservar y auditar la documentación de cada cliente de manera eficiente, conforme a los plazos del CFF (Art. 30).",
+    duracion: "4 meses · 480 horas",
+    perfil: "Contaduría Pública o Administración. Habilidades de organización y manejo de herramientas ofimáticas.",
+    competencias: "CFF Arts. 28–30, confidencialidad fiscal, Office. Análisis y clasificación documental.",
+    entregables: [
+      "Inventario de expedientes actuales por cliente (físicos y digitales)",
+      "Manual de procedimientos para integración y actualización de expedientes",
+      "Estructura de carpetas digitales estandarizada e implementada",
+      "Checklist de documentos requeridos por tipo de cliente y régimen",
+      "Base de datos de control documental en Excel con alertas de vencimiento",
+      "Informe final con propuestas de mejora continua",
+    ]
+  },
+  {
+    num: 3,
+    titulo: "Análisis Comparativo de Regímenes Fiscales para Personas Físicas",
+    area: "Consultoría Fiscal / Investigación Aplicada",
+    descripcion: "Elaboración de un estudio técnico comparativo que analice la carga fiscal efectiva de una persona física con actividad empresarial o profesional bajo los principales regímenes del SAT: RESICO (Régimen 626), Actividades Empresariales y Profesionales (Régimen 612) y Régimen General.",
+    objetivo: "Generar un documento de consulta que sirva al despacho como herramienta de asesoría para orientar a los clientes en la elección del régimen más conveniente según su perfil de ingresos, deducciones y obligaciones.",
+    duracion: "3–4 meses · 360–480 horas",
+    perfil: "Contaduría Pública con avance en materias fiscales (ISR, IVA). Investigación y análisis cuantitativo.",
+    competencias: "LISR Título IV, LIVA, CFF. Análisis financiero, Excel, redacción de informes técnicos.",
+    entregables: [
+      "Marco teórico-legal: LISR Arts. 100–113, Arts. 113-E al 113-J; LIVA Art. 1-A",
+      "Modelo de cálculo en Excel para ISR mensual y anual en cada régimen",
+      "Casos prácticos comparativos con tres perfiles de contribuyente tipo",
+      "Cuadro resumen de obligaciones, tasas y límites por régimen",
+      "Documento ejecutivo de asesoría listo para uso con clientes",
+      "Informe final de residencia",
+    ]
+  },
+  {
+    num: 4,
+    titulo: "Manual de Procedimientos Administrativos del Despacho",
+    area: "Organización y Métodos / Gestión Empresarial",
+    descripcion: "Documentación formal y estructurada de los principales procesos internos del despacho: alta de clientes, recepción y clasificación de información, flujo de declaraciones mensuales y anuales, emisión de CFDIs, control de nómina y atención al cliente.",
+    objetivo: "Contar con un manual institucional que estandarice los procedimientos operativos, facilite la inducción de nuevo personal y asegure la continuidad operativa del despacho.",
+    duracion: "3 meses · 360 horas",
+    perfil: "Contaduría Pública o Licenciatura en Gestión Empresarial. Redacción técnica y manejo de Office.",
+    competencias: "Redacción técnica, diagramas de flujo (Word/Visio/Lucidchart), observación de campo, trabajo en equipo.",
+    entregables: [
+      "Diagnóstico de procesos actuales mediante entrevistas y observación directa",
+      "Mapa de procesos general del despacho (diagrama de flujo)",
+      "Fichas de procedimiento para cada proceso identificado (mínimo 8)",
+      "Formatos estandarizados y checklists operativos",
+      "Manual de inducción para practicantes y residentes",
+      "Informe final con recomendaciones de mejora",
+    ]
+  },
+  {
+    num: 5,
+    titulo: "Herramienta de Cálculo de Nómina y Prestaciones Laborales",
+    area: "Nómina / Derecho Laboral y Fiscal",
+    descripcion: "Diseño y desarrollo de una plantilla en Excel parametrizable para el cálculo integral de nómina quincenal y mensual, incluyendo percepciones, deducciones, ISR (Art. 96 LISR), cuotas IMSS, INFONAVIT, así como cálculo automático de vacaciones, prima vacacional, aguinaldo y finiquitos.",
+    objetivo: "Desarrollar una herramienta confiable y adaptable que automatice el proceso de nómina del despacho para clientes con trabajadores formales, conforme a LFT, LISR y Ley del IMSS.",
+    duracion: "4 meses · 480 horas",
+    perfil: "Contaduría Pública con conocimiento de nómina, seguridad social y derecho laboral. Excel intermedio-avanzado indispensable.",
+    competencias: "LISR Art. 96, Ley del IMSS, LFT, Excel avanzado. Precisión numérica y manejo de datos sensibles.",
+    entregables: [
+      "Análisis de requerimientos: tipos de régimen laboral y prestaciones a cubrir",
+      "Plantilla Excel con cálculo automático de ISR (tarifa mensual Art. 96 LISR)",
+      "Módulo de cuotas IMSS (Arts. 25–28 Ley IMSS) y aportaciones INFONAVIT",
+      "Módulo de prestaciones: vacaciones (Art. 76 LFT), prima vacacional y aguinaldo (Art. 87 LFT)",
+      "Módulo de finiquitos con cálculo proporcional de prestaciones devengadas",
+      "Manual técnico e informe final con casos de prueba documentados",
+    ]
+  },
+  {
+    num: 6,
+    titulo: "Auditoría de CFDIs y Conciliación Contable-Fiscal",
+    area: "Auditoría Fiscal / Contabilidad",
+    descripcion: "Revisión sistemática y conciliación de los Comprobantes Fiscales Digitales por Internet (CFDIs) de ingresos y egresos de un conjunto de clientes del despacho, verificando su correcta aplicación contable, la acumulación de ingresos y la deducción de gastos conforme a LISR y LIVA.",
+    objetivo: "Identificar inconsistencias entre los CFDIs emitidos/recibidos y los registros contables de los clientes auditados, generando un informe de hallazgos y recomendaciones correctivas.",
+    duracion: "4 meses · 480 horas",
+    perfil: "Contaduría Pública con formación en auditoría y contabilidad fiscal. Manejo de Excel y plataformas del SAT (Buzón Tributario, descarga masiva CFDI).",
+    competencias: "LISR Arts. 27, 29; LIVA Art. 5; CFF Arts. 29, 29-A, 29-B. Auditoría, Excel, SAT Buzón Tributario.",
+    entregables: [
+      "Metodología de revisión de CFDIs aplicada (criterios, muestra, herramientas utilizadas)",
+      "Cédulas de auditoría por cliente: cruce de CFDIs vs. registros contables",
+      "Identificación de CFDIs con errores: RFC incorrecto, uso incorrecto, cancelados sin sustituto",
+      "Informe de hallazgos con impacto fiscal estimado por cliente",
+      "Propuesta de controles preventivos para emisión y recepción de CFDIs",
+      "Informe final de residencia",
+    ]
+  },
+  {
+    num: 7,
+    titulo: "Elaboración de Estados Financieros bajo NIF para Clientes PYME",
+    area: "Contabilidad Financiera / NIF",
+    descripcion: "Apoyo en la preparación de estados financieros básicos (Balance General, Estado de Resultados, Flujo de Efectivo y Notas) para clientes PYME del despacho, conforme a las Normas de Información Financiera (NIF) mexicanas aplicables a entidades con fines lucrativos.",
+    objetivo: "Integrar expedientes contables de clientes seleccionados y elaborar sus estados financieros anuales bajo NIF, reforzando la calidad y presentación de la información financiera que el despacho entrega.",
+    duracion: "4 meses · 480 horas",
+    perfil: "Contaduría Pública con dominio de contabilidad financiera y NIF. Excel y preferentemente algún sistema contable (CONTPAQi, Aspel COI).",
+    competencias: "NIF A-1, B-1, B-3, C-1, C-3, D-3. CONTPAQi o Aspel deseable. Análisis financiero y redacción técnica.",
+    entregables: [
+      "Revisión y ajuste de auxiliares contables de los clientes asignados",
+      "Integración de balanzas de comprobación depuradas",
+      "Elaboración de Balance General y Estado de Resultados (mínimo 3 clientes)",
+      "Estado de Flujo de Efectivo (método indirecto) para al menos un cliente",
+      "Notas a los estados financieros según NIF A-1, A-7 y aplicables",
+      "Informe final con reflexión sobre diferencias contable-fiscal",
+    ]
+  },
+  {
+    num: 8,
+    titulo: "Diagnóstico de Cumplimiento en Seguridad Social (IMSS–INFONAVIT)",
+    area: "Seguridad Social / Nómina",
+    descripcion: "Revisión del cumplimiento de las obligaciones patronales en materia de IMSS e INFONAVIT de los clientes del despacho con trabajadores registrados, verificando la correcta integración del salario base de cotización (SBC), pagos de cuotas y aportaciones de vivienda mediante SUA e IDSE.",
+    objetivo: "Detectar diferencias o errores en la determinación del SBC y en los pagos bimestrales al IMSS e INFONAVIT, emitiendo un reporte de brechas con cuantificación económica y propuesta de corrección.",
+    duracion: "3–4 meses · 360–480 horas",
+    perfil: "Contaduría Pública o Administración con conocimiento de seguridad social y nómina. Manejo de IDSE/SUA y Excel.",
+    competencias: "Ley del IMSS Arts. 5-A, 27, 35–38; Ley INFONAVIT Arts. 29, 35. IDSE, SUA, SIPARE, Excel.",
+    entregables: [
+      "Catálogo de trabajadores por cliente con SBC vigente y datos de afiliación",
+      "Cédulas de revisión: cruce entre nómina y movimientos IMSS (altas, bajas, modificaciones)",
+      "Determinación de diferencias en cuotas patronales y obreras por bimestre",
+      "Revisión de aportaciones INFONAVIT y amortizaciones de crédito habitacional",
+      "Informe de hallazgos con cuantificación de contingencias y recomendaciones de regularización",
+      "Informe final de residencia",
+    ]
+  },
+  {
+    num: 9,
+    titulo: "Implementación de Indicadores de Desempeño (KPIs) para el Despacho",
+    area: "Administración Estratégica / Control Interno",
+    descripcion: "Diseño e implementación de un tablero de indicadores clave de desempeño (KPIs) para medir la productividad y rentabilidad operativa del despacho, incluyendo indicadores de cumplimiento de clientes, tiempos de respuesta, carga de trabajo por contador y eficiencia en cobro de honorarios.",
+    objetivo: "Proporcionar a la dirección del despacho una herramienta de toma de decisiones basada en datos, que permita identificar áreas de mejora operativa y evaluar el desempeño del equipo de forma objetiva.",
+    duracion: "3–4 meses · 360–480 horas",
+    perfil: "Contaduría Pública, Licenciatura en Gestión Empresarial o Ingeniería en Sistemas. Excel avanzado o Power BI.",
+    competencias: "Excel avanzado o Power BI, estadística básica, administración por resultados, presentación de datos.",
+    entregables: [
+      "Diagnóstico de necesidades de información de la dirección del despacho",
+      "Propuesta de KPIs con definición, fórmula, fuente de datos y periodicidad",
+      "Tablero de control (dashboard) en Excel o Power BI con visualización gráfica",
+      "Procedimiento de actualización mensual del tablero",
+      "Presentación ejecutiva de resultados del primer período de medición",
+      "Informe final con análisis de resultados y recomendaciones",
+    ]
+  },
+  {
+    num: 10,
+    titulo: "Estudio de Planeación Fiscal para Personas Morales bajo Régimen General",
+    area: "Planeación Fiscal / Corporativo",
+    descripcion: "Elaboración de un análisis de planeación fiscal para clientes personas morales del despacho bajo el Régimen General de Ley (Título II LISR), enfocado en la optimización legal de la carga fiscal mediante el aprovechamiento de deducciones autorizadas, estímulos fiscales y esquemas de distribución de utilidades (CUFIN, CUCA).",
+    objetivo: "Desarrollar un documento técnico de planeación fiscal aplicable a al menos dos clientes personas morales, identificando oportunidades de ahorro fiscal dentro del marco legal vigente y fundamentando cada estrategia en la LISR.",
+    duracion: "4 meses · 480 horas",
+    perfil: "Contaduría Pública con avance en ISR empresarial y planeación fiscal. Dominio de LISR Título II y CFF.",
+    competencias: "LISR Título II (Arts. 9, 25, 77, 78), CFF, planeación fiscal. Excel financiero, redacción ejecutiva.",
+    entregables: [
+      "Diagnóstico fiscal actual de clientes seleccionados: PTU, ISR diferido, CUFIN, CUCA",
+      "Identificación de deducciones autorizadas subutilizadas (Art. 25 LISR) y estímulos fiscales",
+      "Proyección de ISR anual: escenario actual vs. escenario optimizado",
+      "Análisis de distribución de dividendos e impacto en CUFIN (Art. 77 LISR)",
+      "Memoria de cálculo con referencia legal por cada estrategia propuesta",
+      "Informe ejecutivo de planeación fiscal listo para presentación al cliente",
+      "Informe final de residencia",
+    ]
+  },
+];
+
+// ══════════ GENERAR TABLA ÍNDICE ══════════
+const tbody = document.getElementById('tabla-body');
+proyectos.forEach((p, i) => {
+  const horas = p.duracion.includes('480') ? '480 h' : '360–480 h';
+  const badgeClass = p.duracion.includes('480') && !p.duracion.includes('360') ? 'badge-h480' : 'badge-h360';
+  const tr = document.createElement('tr');
+  tr.innerHTML = `
+    <td>P${p.num}</td>
+    <td style="color:var(--azul);font-weight:500">${p.titulo}</td>
+    <td>${p.area}</td>
+    <td><span class="badge ${badgeClass}">${horas}</span></td>
+  `;
+  tr.addEventListener('click', () => {
+    document.getElementById(`proy-${p.num}`).scrollIntoView({ behavior: 'smooth' });
+  });
+  tbody.appendChild(tr);
+});
+
+// ══════════ GENERAR SLIDES DE PROYECTOS ══════════
+const container = document.getElementById('proyectos-container');
+const fondos = ['#F4F6FA','#FFFFFF','#F4F6FA','#FFFFFF','#F4F6FA','#FFFFFF','#F4F6FA','#FFFFFF','#F4F6FA','#FFFFFF'];
+
+proyectos.forEach((p, i) => {
+  const section = document.createElement('section');
+  section.className = 'slide proy-slide';
+  section.id = `proy-${p.num}`;
+  section.style.background = fondos[i];
+
+  const entregablesHTML = p.entregables.map((e, j) =>
+    `<li><span class="ent-num">${j+1}</span>${e}</li>`
+  ).join('');
+
+  section.innerHTML = `
+    <div class="proy-header">
+      <div class="proy-num-badge">P${p.num}</div>
+      <div class="proy-header-text">
+        <h2>${p.titulo}</h2>
+        <div class="proy-area">Área: ${p.area}</div>
+      </div>
+    </div>
+    <div class="proy-body stagger">
+      <div class="proy-left">
+        <div class="proy-section-label">Descripción del proyecto</div>
+        <p class="proy-desc">${p.descripcion}</p>
+        <div class="proy-section-label">Objetivo general</div>
+        <p class="proy-objetivo">${p.objetivo}</p>
+        <div style="margin-top:1.1rem">
+          <div class="info-grid">
+            <div class="info-chip chip-dur">
+              <div class="ic-label">⏱ Duración estimada</div>
+              <div class="ic-val">${p.duracion}</div>
+            </div>
+            <div class="info-chip chip-perfil">
+              <div class="ic-label">👤 Perfil del residente</div>
+              <div class="ic-val">${p.perfil}</div>
+            </div>
+            <div class="info-chip chip-comp">
+              <div class="ic-label">⚡ Competencias clave</div>
+              <div class="ic-val">${p.competencias}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="proy-right">
+        <div class="proy-section-label">Entregables esperados</div>
+        <ul class="entregables-list">${entregablesHTML}</ul>
+      </div>
+    </div>
+  `;
+  container.appendChild(section);
+});
+
+// ══════════ GENERAR NAV DOTS ══════════
+const allSlides = document.querySelectorAll('.slide');
+const navDots = document.getElementById('nav-dots');
+allSlides.forEach((_, i) => {
+  const d = document.createElement('div');
+  d.className = 'dot' + (i === 0 ? ' active' : '');
+  d.addEventListener('click', () => allSlides[i].scrollIntoView({ behavior: 'smooth' }));
+  navDots.appendChild(d);
+});
+
+// ══════════ INTERSECTION OBSERVER ══════════
+let current = 0;
+const dots = document.querySelectorAll('.dot');
+const progress = document.getElementById('progress');
+
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+      entry.target.querySelectorAll('.stagger').forEach(el => {
+        setTimeout(() => el.classList.add('go'), 180);
+      });
+      const idx = Array.from(allSlides).indexOf(entry.target);
+      if (idx !== -1) {
+        current = idx;
+        dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+        progress.style.width = ((idx + 1) / allSlides.length * 100) + '%';
+      }
+    }
+  });
+}, { threshold: 0.35 });
+
+allSlides.forEach(s => observer.observe(s));
+
+// ══════════ TECLADO ══════════
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowDown' || e.key === 'PageDown') { e.preventDefault(); allSlides[Math.min(current+1,allSlides.length-1)].scrollIntoView({behavior:'smooth'}); }
+  if (e.key === 'ArrowUp'   || e.key === 'PageUp')   { e.preventDefault(); allSlides[Math.max(current-1,0)].scrollIntoView({behavior:'smooth'}); }
+});
+</script>
+</body>
+</html>
